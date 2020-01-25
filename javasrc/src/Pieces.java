@@ -1,7 +1,7 @@
 import static java.awt.Color.black;
 
 public class Pieces {
-    private Piece[] pieces = new Piece[16];
+    private final Piece[] pieces = new Piece[16];
 
     public Pieces() {
         pieces[0] = new Piece(Attributes.black, Attributes.square, Attributes.small, Attributes.hollow);

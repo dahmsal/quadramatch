@@ -4,8 +4,8 @@ import java.util.ArrayList;
  * The GameManager defines the Turns and checks for victory conditions
  */
 public class GameManager {
-    private Board board;
-    private Pieces pieces;
+    private final Board board;
+    private final Pieces pieces;
 
     public GameManager() {
         this.board = new Board();

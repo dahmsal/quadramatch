@@ -5,8 +5,8 @@ import java.util.ArrayList;
  *
  */
 public class Board {
-    private Piece [] [] board;
-    private Pieces pieces;
+    private final Piece [] [] board;
+    private final Pieces pieces;
     public Board() {
         this.board = new Piece[6][6];
         this.pieces = new Pieces();
