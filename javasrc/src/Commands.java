@@ -1,0 +1,2 @@
+public enum Commands {START, SELECT, PLACE, BAG, ROWPRINT, COLPRINT, QUIT,
+}

@@ -5,7 +5,7 @@ import java.util.ArrayList;
  *
  */
 public class Board {
-    private final Piece [] [] board;
+    private  Piece [] [] board;
     private final Pieces pieces;
     public Board() {
         this.board = new Piece[6][6];
@@ -139,6 +139,10 @@ public class Board {
         } catch (NullPointerException e) {
             return null;
         }
+    }
+
+    public void clearBoard() {
+        this.board = new Piece[6][6];
     }
 }
 
