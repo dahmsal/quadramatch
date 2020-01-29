@@ -144,5 +144,9 @@ public class Board {
     public void clearBoard() {
         this.board = new Piece[6][6];
     }
+
+    public Piece[][] getBoard() {
+        return board;
+    }
 }
 

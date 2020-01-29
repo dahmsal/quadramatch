@@ -6,8 +6,9 @@ public class Piece {
     private Attributes size;
     private Attributes density;
     private boolean placed;
+    private int id;
 
-    public Piece (Attributes color,Attributes shape,Attributes size,Attributes density ) {
+    public Piece (Attributes color,Attributes shape,Attributes size,Attributes density,int id ) {
         if ( color == Attributes.black || color == Attributes.white) {
             this.color = color;
         }
@@ -37,6 +38,7 @@ public class Piece {
             throw new IllegalArgumentException();
         }
         this.placed = false;
+        this.id = id;
     }
 
     public Attributes getColor() {
@@ -61,6 +63,12 @@ public class Piece {
     public void setPlaced() {
         this.placed = true;
     }
+    public void resetPlaced(){ this.placed = false; }
+
+    public int getId() {
+        return id;
+    }
+
     @Override
     public String toString() {
         return this.color + ";"+ this.shape + ";" + this.size + ";" + this.density;

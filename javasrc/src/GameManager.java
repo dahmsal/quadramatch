@@ -45,7 +45,7 @@ public class GameManager {
         //Iterate through all four Strings
         if(fourStringArray != null) {
             for (Piece[] fourString : fourStringArray) {
-                if (pieces.ComparePiece(fourString)) {
+                if (pieces.comparePiece(fourString)) {
                     return true;
                 }
             }
@@ -57,7 +57,7 @@ public class GameManager {
      * @throws IllegalArgumentException if there are no stones placed on the board
      * @return Type:Piece[][4] where the first index gives access to the four Strings in the second one
      */
-    public Piece[][] FindFourStringNormal() {
+    public Piece[][] findFourStringNormal() {
         //A List of Array containing the 4 strings
         ArrayList<Piece[]> fourString = new ArrayList<>();
         Integer[][] directionsTemp;
