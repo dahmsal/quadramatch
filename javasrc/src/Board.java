@@ -1,12 +1,17 @@
-import edu.kit.informatik.Terminal;
+
 import java.util.ArrayList;
 /**
  * The Board stores the placed pieces and their positions
- *
+ * @author dahms
+ * @version 1
  */
 public class Board {
     private  Piece [] [] board;
     private final Pieces pieces;
+
+    /**
+     * The board is initialised as a piece matrix
+     */
     public Board() {
         this.board = new Piece[6][6];
         this.pieces = new Pieces();
@@ -20,7 +25,7 @@ public class Board {
      */
     public void placePiece(int i, int[] position) {
         //is the spot empty
-        if(this.board[position[0]][position[1]] == null){
+        if ( this.board[position[0]][position[1]] == null ) {
             this.board[position[0]][position[1]] = pieces.getPiece(i);
         }
         else {
@@ -30,79 +35,74 @@ public class Board {
 
     /**
      * Find adjacent stones to the stone at the given index
-     * @param pos the x and y coordinate in a vector
+     * @param position the x and y coordinate in a vector
+     * @param gameMode the game mode of the current game
      * @throws NullPointerException if the result array is empty, ergo no stones are adjacent
      * @return Type:Integer[][], the first Index is used to access the stones, the second is used for coordinates
      */
-    public Integer[][] adjacentStonesStandard(Integer[] pos) {
-        ArrayList<Integer[]> result = new ArrayList<>();
-        Integer[] positionTemp = new Integer[2];
-        //check above, if the stone is in the first row do nothing
-        if (pos[0] != 0) {
-            if (board[(pos[0] - 1)][pos[1]] != null) {
-                positionTemp[0] = pos[0] - 1;
-                positionTemp[1] = pos[1];
-                result.add(positionTemp);
-            }
+    public Position[] adjacentStonesStandard(Position position, Arguments gameMode) {
+        ArrayList<Position> result = new ArrayList<>();
+        if (position.getX() != 0) { //check above, if the stone is in the first row do nothing
+            if (board[(position.getX() - 1)][position.getY()] != null) {
+                result.add(new Position(position.getX() - 1, position.getY())); }
+        } else if (position.getX() == 0 && gameMode == Arguments.TORUS) {
+            if (board[torusConvert(position.getX() - 1) % 6][torusConvert(position.getY()) % 6] != null) {
+                result.add(new Position((position.getX() - 1) % 6 , (position.getY()) % 6)); }
         }
-        //check right above
-        if (pos[0] != 0 && pos[1] != 5) {
-            if (board[(pos[0] - 1)][(pos[1] + 1)] != null) {
-                positionTemp[0] = pos[0] - 1;
-                positionTemp[1] = pos[1] + 1;
-                result.add(positionTemp);
-            }
+        if (position.getX() != 0 && position.getY() != 5) {  //check right above
+            if (board[(position.getX() - 1)][(position.getY() + 1)] != null) {
+                result.add(new Position(position.getX() - 1, position.getY() + 1)); }
+        } else if (position.getX() == 0 && position.getY() == 5 && gameMode == Arguments.TORUS) {
+            if (board[torusConvert(position.getX() - 1) % 6]
+                    [torusConvert(position.getY() + 1) % 6] != null) {
+                result.add(new Position((position.getX() - 1) % 6, (position.getY() + 1) % 6)); }
         }
-        //check right
-        if (pos[1] != 5) {
-            if (board[(pos[0])][(pos[1] + 1)] != null) {
-                positionTemp[0] = pos[0];
-                positionTemp[1] = pos[1] + 1;
-                result.add(positionTemp);
-            }
+        if (position.getY() != 5) { //check right
+            if (board[(position.getX())][(position.getY() + 1)] != null) {
+                result.add(new Position(position.getX(), position.getY() + 1)); }
+        } else if (position.getY() == 5 && gameMode == Arguments.TORUS) {
+            if (board[torusConvert(position.getX()) % 6][torusConvert(position.getY() + 1) % 6] != null) {
+                result.add(new Position((position.getX()) % 6, (position.getY() + 1) % 6)); }
         }
-        //check down right
-        if (pos[0] != 5 && pos[1] != 5) {
-            if (board[(pos[0] + 1)][(pos[1] + 1)] != null) {
-                positionTemp[0] = pos[0] + 1;
-                positionTemp[1] = pos[1] + 1;
-                result.add(positionTemp);
-            }
+        if (position.getX() != 5 && position.getY() != 5) { //check down right
+            if (board[(position.getX() + 1)][(position.getY() + 1)] != null) {
+                result.add(new Position(position.getX() + 1, position.getY() + 1)); }
+        } else if (position.getX() == 5 && position.getY() == 5 && gameMode == Arguments.TORUS) {
+            if (board[torusConvert(position.getX() + 1) % 6]
+                    [torusConvert(position.getY() + 1) % 6] != null) {
+                result.add(new Position((position.getX() + 1) % 6, (position.getY() + 1) % 6)); }
         }
-        //check down
-        if (pos[0] != 5) {
-            if (board[(pos[0] + 1)][(pos[1])] != null) {
-                positionTemp[0] = pos[0] + 1;
-                positionTemp[1] = pos[1];
-                result.add(positionTemp);
-            }
+        if (position.getX() != 5) { //check down
+            if (board[(position.getX() + 1)][(position.getY())] != null) {
+                result.add(new Position(position.getX() + 1, position.getY())); }
+        } else if (position.getX() == 5 && gameMode == Arguments.TORUS) {
+            if (board[torusConvert(position.getX() + 1) % 6][torusConvert(position.getY()) % 6] != null) {
+                result.add(new Position((position.getX() + 1) % 6, (position.getY()) % 6)); }
         }
-        //check down left
-        if (pos[0] != 5 && pos[1] != 0) {
-            if (board[(pos[0] + 1)][(pos[1] - 1)] != null) {
-                positionTemp[0] = pos[0] + 1;
-                positionTemp[1] = pos[1] - 1;
-                result.add(positionTemp);
-            }
+        if (position.getX() != 5 && position.getY() != 0) { //check down left
+            if (board[(position.getX() + 1)][(position.getY() - 1)] != null) {
+                result.add(new Position(position.getX() + 1, position.getY() - 1)); }
+        } else if (position.getX() == 5 && position.getY() == 0 && gameMode == Arguments.TORUS) {
+            if (board[torusConvert(position.getX() + 1) % 6]
+                    [torusConvert(position.getY() - 1) % 6] != null) {
+                result.add(new Position((position.getX() + 1) % 6, (position.getY() - 1) % 6)); }
         }
-        //check left
-        if (pos[1] != 0) {
-            if (board[(pos[0])][(pos[1] - 1)] != null) {
-                positionTemp[0] = pos[0];
-                positionTemp[1] = pos[1] - 1;
-                result.add(positionTemp);
-            }
+        if (position.getY() != 0) { //check left
+            if (board[(position.getX())][(position.getY() - 1)] != null) {
+                result.add(new Position(position.getX(), position.getY() - 1)); }
+        } else if (position.getY() == 0 && gameMode == Arguments.TORUS) {
+            if (board[torusConvert(position.getX()) % 6][torusConvert(position.getY() - 1) % 6] != null) {
+                result.add(new Position((position.getX()) % 6, (position.getY() - 1) % 6)); }
         }
-        //check left above
-        if (pos[0] != 0 && pos[1] != 0) {
-            if (board[(pos[0] - 1)][(pos[1] - 1)] != null) {
-                positionTemp[0] = pos[0] - 1;
-                positionTemp[1] = pos[1] - 1;
-                result.add(positionTemp);
-            }
+        if (position.getX() != 0 && position.getY() != 0) { //check left above
+            if (board[(position.getX() - 1)][(position.getY() - 1)] != null) {
+                result.add(new Position(position.getX() - 1, position.getY() - 1)); }
+        } else if (position.getX() == 0 && position.getY() == 0 && gameMode == Arguments.TORUS) {
+            if (board[torusConvert(position.getX() + 1) % 6]
+                    [torusConvert(position.getY() + 1) % 6] != null) {
+                result.add(new Position((position.getX() - 1) % 6, (position.getY() - 1) % 6)); }
         }
-        //Type Cast for the toArray method
-        Integer[][] resultArray = new Integer[result.size()][2];
+        Position[] resultArray = new Position[result.size()]; //Type Cast for the toArray method
         resultArray = result.toArray(resultArray);
         return resultArray;
     }
@@ -111,42 +111,72 @@ public class Board {
      * @throws NullPointerException if no stones are placed on the board
      * @return Type:Integer[][], the first Index is used to access the stones, the second is used for coordinates
      */
-    public Integer[][] usedPositions() {
-        ArrayList<Integer[]> positions = new ArrayList<>();
-        Integer [] positionTemp = new Integer[2];
+    public Position[] usedPositions() {
+        ArrayList<Position> positions = new ArrayList<>();
         //Iterate through every field on the matrix
-        for(int i = 0; i < this.board.length; i++) {
-            for(int j = 0; j < this.board[1].length; j++) {
-                if(this.board[i][j] != null) {
-                    positionTemp[0] = i;
-                    positionTemp[1] = j;
-                    positions.add(positionTemp);
+        for (int i = 0; i < this.board.length; i++) {
+            for (int j = 0; j < this.board[1].length; j++) {
+                if (this.board[i][j] != null) {
+                    positions.add(new Position(i, j));
                 }
             }
         }
         //Type Cast for the array list, the first Index is used to access the stones, the second is used for coordinates
-        Integer[][] positionsArray = new Integer[positions.size()][2];
+        Position[] positionsArray = new Position[positions.size()];
         positionsArray = positions.toArray(positionsArray);
         return positionsArray;
     }
     /**
      * Return the element at the given position
      * @param position position on the board
+     * @param gameMode current game mode
+     * @return the piece at the position
      */
-    public Piece getPiece(Integer[] position) {
-        try {
-            return this.board[position[0]][position[1]];
-        } catch (NullPointerException e) {
-            return null;
+    public Piece getPiece(Position position, Arguments gameMode) {
+        switch (gameMode) {
+            case STANDARD:
+                try {
+                    return this.board[position.getX()][position.getY()];
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    return null;
+                }
+            case TORUS:
+                try {
+                    return this.board[torusConvert(position.getX())][torusConvert(position.getY())];
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    return this.board[torusConvert(position.getX()) % 6][torusConvert(position.getY()) % 6];
+                }
+            default:
+                return null;
         }
     }
 
+    /**
+     * clear the board
+     */
     public void clearBoard() {
         this.board = new Piece[6][6];
     }
 
+    /**
+     * simple get
+     * @return the current board
+     */
     public Piece[][] getBoard() {
         return board;
+    }
+
+    /**
+     * convert negative numbers to the correct position on the torus board
+     * @param posVal position value
+     * @return the actual value
+     */
+    private int torusConvert(int posVal) {
+        if (posVal < 0) {
+            return 6 + posVal % 6;
+        } else {
+            return posVal;
+        }
     }
 }
 

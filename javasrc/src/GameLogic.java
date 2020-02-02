@@ -1,17 +1,26 @@
 import edu.kit.informatik.Terminal;
 
+/**
+ * The upper level game logic and command interpretation
+ * @author dahms
+ * @version 1
+ */
 public class GameLogic {
-    private Board board;
-    private Pieces pieces;
-    private Input input;
-    private GameManager gameManager;
+    private Board board = new Board();
+    private Pieces pieces = new Pieces();
+    private Input input = new Input();
+    private Output output = new Output();
+    private GameManager gameManager = new GameManager();
     private Arguments gameMode;
     private int turnCount;
     private Integer stoneId;
     private int player;
     private boolean gameStatus;
 
-    public GameLogic(){
+    /**
+     * empty constructor
+     */
+    public GameLogic() {
     }
 
     /**
@@ -38,37 +47,37 @@ public class GameLogic {
      * @throws IllegalArgumentException if the player switch fails
      */
     public void selectCommand(String userInput) {
-        if(gameStatus) {
+        String tempInput = userInput;
+        if (gameStatus) {
             if (this.stoneId == null) {
                 while (true) {
                     //retry the input if it was false
                     try {
-                        input.selectArgument(userInput);
+                        input.selectArgument(tempInput);
                     } catch (IllegalArgumentException n) {
                         Terminal.printError("Input could not be interpreted, input again [select <id>]");
-                        userInput = Terminal.readLine();
+                        tempInput = Terminal.readLine();
                         continue;
                     }
-                    this.stoneId = input.selectArgument(userInput);
+                    try {
+                        pieces.getPiece(input.selectArgument(tempInput));
+                    } catch (ArrayIndexOutOfBoundsException A) {
+                        Terminal.printError("Stone ID invalid, please enter an ID from 0 to 15");
+                        tempInput = Terminal.readLine();
+                        continue;
+                    }
+                    this.stoneId = input.selectArgument(tempInput);
                     this.pieces = gameManager.getPieces();
                     //check if stone is placed, ask for new Id if the stone is placed
-                    if (!pieces.getPiece(stoneId).isPlaced()) {
+                    if (pieces.getPiece(stoneId).isPlaced()) {
                         Terminal.printError("The stone selected is already placed, choose another [select <id>]");
-                        userInput = Terminal.readLine();
+                        tempInput = Terminal.readLine();
                         continue;
                     }
                     //switch active player
-                    switch (this.player) {
-                        case 1:
-                            this.player = 2;
-                            break;
-                        case 2:
-                            this.player = 1;
-                            break;
-                        default:
-                            throw new IllegalArgumentException();
-                    }
+                    switchPlayer();
                     Terminal.printLine("OK");
+                    Terminal.printLine("P" + this.player + " is next to place a piece");
                     break;
                 }
             } else {
@@ -78,14 +87,32 @@ public class GameLogic {
             Terminal.printError("No game is running, try [start] to start a new game or [q] to quit");
         }
     }
+
+    /**
+     * Switch the active player
+     */
+    private void switchPlayer() {
+        switch (this.player) {
+            case 1:
+                this.player = 2;
+                break;
+            case 2:
+                this.player = 1;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     /**
      * The player can place stones, if the location is invalid or no stone is picked the entire turn is reset
+     * @param userInput to parse the position
      */
     public void placeCommand(String userInput) {
-        if(gameStatus) {
+        if (gameStatus) {
             //check if a stone was picked up
             if (this.stoneId != null) {
-                int[] position = new int[2];
+                int[] position;
                 position = input.placeArgument(userInput);
                 gameManager.updateBoard(this.board);
                 gameManager.updatePieces(this.pieces);
@@ -93,6 +120,12 @@ public class GameLogic {
                     gameManager.turn(stoneId, position);
                 } catch (IllegalArgumentException e) {
                     Terminal.printError("The turn could not be executed, the position may be used");
+                    Terminal.printLine("Player " + this.player + " can select a new stone");
+                    this.stoneId = null;
+                    return;
+                } catch (ArrayIndexOutOfBoundsException a) {
+                    Terminal.printError("The position is invalid, choose a value from 0 to 5");
+                    Terminal.printLine("Player " + this.player + " can select a new stone");
                     this.stoneId = null;
                     return;
                 }
@@ -101,31 +134,23 @@ public class GameLogic {
                 this.pieces = gameManager.getPieces();
                 this.stoneId = null;
                 //check for win
-                if (gameManager.checkWin(gameManager.findFourStringNormal())) {
+                if (gameManager.checkWin(gameManager.findFourStringNormal(this.gameMode))) {
                     Terminal.printLine("P" + this.player + " wins");
                     Terminal.printLine(this.turnCount);
                     this.gameStatus = false;
                     return;
                 }
                 //check for tie
-                if (this.pieces.getBag().length == 0){
+                if (this.pieces.getBag().length == 0) {
                     Terminal.printLine("draw");
                     this.gameStatus = false;
                     return;
                 }
                 //switch active player
-                switch (this.player) {
-                    case 1:
-                        this.player = 2;
-                        break;
-                    case 2:
-                        this.player = 1;
-                        break;
-                    default:
-                        throw new IllegalArgumentException();
-                }
                 this.turnCount++;
                 Terminal.printLine("OK");
+                Terminal.printLine("P" + this.player + " is next to select a piece");
+                output.boardPrint(this.board);
             } else {
                 Terminal.printError("No stone was picked up");
             }
@@ -137,13 +162,21 @@ public class GameLogic {
      * print all pieces from the bag
      */
     public void bagCommand() {
-        for(Integer pieceId : this.pieces.getBag()) {
-            if(!this.stoneId.equals(pieceId)) {
-                Terminal.printLine(pieceId);
+        StringBuilder returnString;
+        returnString = new StringBuilder();
+        for (Integer pieceId : this.pieces.getBag()) {
+            if (stoneId == null || !this.stoneId.equals(pieceId)) {
+                //Construct Output [pieceID + " "]
+                returnString.append(pieceId).append(" ");
             }
         }
+        Terminal.printLine(returnString);
     }
 
+    /**
+     * simple getter
+     * @return board
+     */
     public Board getBoard() {
         return board;
     }

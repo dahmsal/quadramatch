@@ -1,38 +1,48 @@
 import edu.kit.informatik.Terminal;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.lang.String;
-public class Input {
 
+/**
+ * Input manager
+ * @author dahms
+ * @version 1
+ */
+public class Input {
+    /**
+     * empty constructor
+     */
     public Input() {
     }
 
     /**
      * Parses the input and returns the corresponding command
-     * @param input user input
+     * @param userInput user input
      * @return command
      * @throws IllegalArgumentException if no viable command could be parsed
      */
-    public Commands inputHandler (String input) {
-        if(input.matches("^(start)\\s(standard|torus)$")) {
+    public Commands inputHandler(String userInput) {
+        //change syntax from inputs to ensure correct regex for [n n] and [n;n]
+        String input = userInput.replace(";", " ");
+        if (input.matches("^(start)\\s(standard|torus)$")) {
             return Commands.START;
         }
-        if(input.matches("^(select)")) {
+        if (input.matches("^(select)\\s\\d+")) {
             return Commands.SELECT;
         }
-        if(input.matches("^(place)")) {
+        if (input.matches("^(place)\\s\\d+\\s\\d+")) {
             return Commands.PLACE;
         }
-        if(input.matches("^(bag)")) {
+        if (input.matches("^(bag)")) {
             return Commands.BAG;
         }
-        if(input.matches("^(rowprint)")) {
+        if (input.matches("^(rowprint)\\s\\d+")) {
             return Commands.ROWPRINT;
         }
-        if(input.matches("^(colprint)")) {
+        if (input.matches("^(colprint)\\s\\d+")) {
             return Commands.COLPRINT;
         }
-        if(input.matches("^(quit)")) {
+        if (input.matches("^(quit)") || input.matches("q")) {
             return Commands.QUIT;
         }
         throw new IllegalArgumentException();
@@ -45,10 +55,10 @@ public class Input {
      * @throws IllegalArgumentException if the argument could not be parsed
      */
     public Arguments startArgument(String input) {
-        if (input.matches("(standard)$")) {
+        if (input.matches("^(start)\\s(standard)$")) {
             return Arguments.STANDARD;
         }
-        if (input.matches("(torus)$")) {
+        if (input.matches("^(start)\\s(torus)$")) {
             return Arguments.TORUS;
         }
         throw new IllegalArgumentException();
@@ -66,7 +76,10 @@ public class Input {
         Pattern number = Pattern.compile("\\d+");
         Matcher match = number.matcher(input);
         try {
-            return Integer.parseInt(match.group());
+            if (match.find()) {
+                return Integer.parseInt(match.group().trim());
+            }
+            throw new NullPointerException();
         } catch (NumberFormatException e) {
             Terminal.printError("Problems while parsing the input");
             throw new IllegalArgumentException();
@@ -85,8 +98,11 @@ public class Input {
         Matcher match = number.matcher(input);
         int[] returnInt = new int[2];
         try {
-            returnInt[0] = Integer.parseInt(match.group(0));
-            returnInt[1] = Integer.parseInt(match.group(1));
+            int i = 0;
+            while (match.find()) {
+                returnInt[i] = Integer.parseInt(match.group().trim());
+                i++;
+            }
         } catch (NumberFormatException e) {
             Terminal.printError("Problems while parsing the int[]");
             throw new IllegalArgumentException();

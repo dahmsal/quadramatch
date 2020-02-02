@@ -1,2 +1,37 @@
-public enum Attributes { black, white, square, cylindrical, small, big, massive, hollow
+/**
+ * The attributes of the pieces
+ */
+public enum Attributes {
+    /**
+     * color black
+     */
+    black,
+    /**
+     * color white
+     */
+    white,
+    /**
+     * square shape
+     */
+    square,
+    /**
+     * cylindrical shape
+     */
+    cylindrical,
+    /**
+     * small size
+     */
+    small,
+    /**
+     * big size
+     */
+    big,
+    /**
+     * density
+     */
+    massive,
+    /**
+     * density
+     */
+    hollow
 }

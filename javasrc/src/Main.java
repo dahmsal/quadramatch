@@ -1,8 +1,17 @@
 import edu.kit.informatik.Terminal;
 
+/**
+ * the main method
+ * @author dahms
+ * @version 1
+ */
 
 
 public class Main {
+    /**
+     * main method
+     * @param args in line args
+     */
     public static void main(String[] args) {
         GameManager gameManager = new GameManager();
         GameLogic gameLogic = new GameLogic();
@@ -11,12 +20,12 @@ public class Main {
         String userInput;
        while (true) {
            userInput = Terminal.readLine();
-           /*try {
+           try {
                input.inputHandler(userInput);
            } catch (IllegalArgumentException e) {
                Terminal.printError("INVALID INPUT");
                continue;
-           }*/
+           }
            switch (input.inputHandler(userInput)) {
                case START:
                    gameLogic.startCommand(userInput);
@@ -41,7 +50,7 @@ public class Main {
                default:
                    Terminal.printError("Something went wrong in the input handling");
            }
-           if(input.inputHandler(userInput) == Commands.QUIT) {
+           if (input.inputHandler(userInput) == Commands.QUIT) {
                break;
            }
        }
